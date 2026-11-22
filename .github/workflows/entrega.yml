@@ -1,0 +1,23 @@
+name: Entrega MP4 temporario
+on:
+  workflow_dispatch:
+jobs:
+  entrega:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Baixar video e validar hash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p video
+          gh release download banana-radioativa-v1 --repo "$GITHUB_REPOSITORY" --pattern 'Banana-radioativa-3D.mp4' --dir video
+          echo "6850b02dea0e76b671a39beedc2f60759efcecd72ff6313fe59f5e248d2d0d2f  video/Banana-radioativa-3D.mp4" | sha256sum -c -
+      - name: Publicar como artefato temporario
+        uses: actions/upload-artifact@v4
+        with:
+          name: banana-radioativa-video
+          path: video/Banana-radioativa-3D.mp4
+          retention-days: 1
+          if-no-files-found: error
